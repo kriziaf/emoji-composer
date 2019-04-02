@@ -17,7 +17,7 @@ class App extends Component {
       tweets: [],
       checked: false,
       error: false,
-      errorMessage: "Please click switch above to go online."
+      errorMessage: "Switch the toggle on top of the screen to go online."
     };
 
     this.speech = new Speech();
