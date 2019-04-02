@@ -121,7 +121,6 @@ class App extends Component {
           </label>
         </div>
         <div className="textarea-container">
-          <h2>Say something with emoji!</h2>
           <h2>
             <div
               className="error"
