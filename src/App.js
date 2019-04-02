@@ -5,20 +5,28 @@ import { Picker } from "emoji-mart";
 import { Menu } from "semantic-ui-react";
 import "semantic-ui-css/semantic.min.css";
 import Speech from "speak-tts";
+import "@material/react-switch/dist/switch.css";
+import Switch from "@material/react-switch";
 
 class App extends Component {
   state = {
     activeItem: "Editor",
     tweet: "",
-    tweets: []
+    tweets: [],
+    checked: false,
+    error: false
   };
 
   handleItemClick = (e, { name }) => this.setState({ activeItem: name });
 
   handleSubmitTweet = () => {
-    let tweets = this.state.tweets;
-    tweets.push(this.state.tweet);
-    this.setState({ tweets, tweet: "" });
+    if (this.state.checked) {
+      let tweets = this.state.tweets;
+      tweets.push(this.state.tweet);
+      this.setState({ tweets, tweet: "", error: !this.state.error });
+    } else {
+      this.setState({ error: !this.state.error });
+    }
   };
 
   changeHandler = e => {
@@ -61,6 +69,13 @@ class App extends Component {
     });
   };
 
+  swictchHandler = e => {
+    if (this.state.error) {
+      this.setState({ error: !this.state.error, checked: e.target.checked });
+    }
+    this.setState({ checked: e.target.checked });
+  };
+
   render() {
     const { activeItem } = this.state;
     const tweets = this.state.tweets.map((tweet, i) => (
@@ -69,6 +84,14 @@ class App extends Component {
 
     return (
       <div className="App">
+        <Switch
+          nativeControlId="my-switch"
+          checked={this.state.checked}
+          onChange={e => this.setState({ checked: e.target.checked })}
+        />
+        <label htmlFor="my-switch">
+          <span id="switch">{this.state.checked ? "Online" : "Offline"}</span>
+        </label>
         <Menu tabular>
           <Menu.Item
             name="Editor"
@@ -83,6 +106,16 @@ class App extends Component {
         </Menu>
         <div className="textarea-container">
           <h1>Say something with emoji!</h1>
+          <h2>
+            <div
+              className="error"
+              style={
+                this.state.error ? { display: "block" } : { display: "none" }
+              }
+            >
+              Please click switch above to go online.
+            </div>
+          </h2>
           <textarea
             onChange={this.changeHandler}
             value={this.state.tweet}

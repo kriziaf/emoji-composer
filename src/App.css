@@ -65,3 +65,11 @@ aside li {
   display: block;
   padding: 5px;
 }
+
+#switch {
+  padding-left: 10px;
+}
+
+.error {
+  color: red;
+}
