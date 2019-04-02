@@ -73,3 +73,7 @@ aside li {
 .error {
   color: red;
 }
+
+#switch-container {
+  padding-top: 10px;
+}

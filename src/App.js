@@ -9,13 +9,27 @@ import "@material/react-switch/dist/switch.css";
 import Switch from "@material/react-switch";
 
 class App extends Component {
-  state = {
-    activeItem: "Editor",
-    tweet: "",
-    tweets: [],
-    checked: false,
-    error: false
-  };
+  constructor() {
+    super();
+    this.state = {
+      activeItem: "Editor",
+      tweet: "",
+      tweets: [],
+      checked: false,
+      error: false,
+      errorMessage: "Please click switch above to go online."
+    };
+
+    this.speech = new Speech();
+    this.speech.init({
+      volume: 1,
+      lang: "en-GB",
+      rate: 1,
+      pitch: 1,
+      voice: "Google UK English Male",
+      splitSentences: true
+    });
+  }
 
   handleItemClick = (e, { name }) => this.setState({ activeItem: name });
 
@@ -27,8 +41,13 @@ class App extends Component {
         this.setState({ tweets, tweet: "", error: !this.state.error });
       }
       this.setState({ tweets, tweet: "" });
+      this.speech.speak({ text: "Message posted!" });
     } else {
       this.setState({ error: !this.state.error });
+
+      this.speech.speak({
+        text: `${this.state.errorMessage}`
+      });
     }
   };
 
@@ -57,17 +76,7 @@ class App extends Component {
   };
 
   speakButton = () => {
-    const speech = new Speech();
-    speech.init({
-      volume: 1,
-      lang: "en-GB",
-      rate: 1,
-      pitch: 1,
-      voice: "Google UK English Male",
-      splitSentences: true
-    });
-
-    speech.speak({
+    this.speech.speak({
       text: `${this.state.tweet}`
     });
   };
@@ -87,25 +96,22 @@ class App extends Component {
 
     return (
       <div className="App">
-        <Switch
-          nativeControlId="my-switch"
-          checked={this.state.checked}
-          onChange={e => this.setState({ checked: e.target.checked })}
-        />
-        <label htmlFor="my-switch">
-          <span id="switch">{this.state.checked ? "Online" : "Offline"}</span>
-        </label>
+        <div id="switch-container">
+          <Switch
+            nativeControlId="my-switch"
+            checked={this.state.checked}
+            onChange={e => this.setState({ checked: e.target.checked })}
+          />
+          <label htmlFor="my-switch">
+            <span id="switch">{this.state.checked ? "Online" : "Offline"}</span>
+          </label>
+        </div>
         <Menu tabular>
           <Menu.Item
             name="Editor"
             active={activeItem === "Editor"}
             onClick={this.handleItemClick}
           />
-          {/* <Menu.Item
-            name="About"
-            active={activeItem === "About"}
-            onClick={this.handleItemClick}
-          /> */}
         </Menu>
         <div className="textarea-container">
           <h1>Say something with emoji!</h1>
@@ -116,7 +122,7 @@ class App extends Component {
                 this.state.error ? { display: "block" } : { display: "none" }
               }
             >
-              Please click switch above to go online.
+              {this.state.errorMessage}
             </div>
           </h2>
           <textarea
