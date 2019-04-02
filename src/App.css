@@ -1,3 +1,13 @@
+@import url("https://fonts.googleapis.com/css?family=Asap");
+
+* {
+  font-size: 100%;
+  font-family: "Asap";
+  color: inherit;
+  margin: 0;
+  font-size: calc(0.5em + 1vw);
+}
+
 .App {
   text-align: center;
 }
@@ -30,4 +40,28 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.textarea-container {
+  position: relative;
+}
+
+.textarea-container textarea {
+  width: 75%;
+  height: 150px;
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  background-color: #f8f8f8;
+  resize: none;
+}
+
+.textarea-container button {
+  margin: 5px;
+}
+
+aside,
+aside li {
+  display: block;
+  padding: 5px;
 }
