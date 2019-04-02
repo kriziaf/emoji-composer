@@ -126,8 +126,8 @@ class App extends Component {
             placeholder="What's on your mind?"
           />
           <p>
-            <button onClick={this.handleSubmitTweet}>Post your message</button>
             <button onClick={this.speakButton}>Listen to message</button>
+            <button onClick={this.handleSubmitTweet}>Post your message</button>
           </p>
           <aside>
             <ul style={{ listStyleType: "none" }}>{tweets}</ul>
