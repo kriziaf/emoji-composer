@@ -23,7 +23,10 @@ class App extends Component {
     if (this.state.checked) {
       let tweets = this.state.tweets;
       tweets.push(this.state.tweet);
-      this.setState({ tweets, tweet: "", error: !this.state.error });
+      if (this.state.error) {
+        this.setState({ tweets, tweet: "", error: !this.state.error });
+      }
+      this.setState({ tweets, tweet: "" });
     } else {
       this.setState({ error: !this.state.error });
     }
