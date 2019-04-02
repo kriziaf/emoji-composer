@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import "./App.css";
 import "emoji-mart/css/emoji-mart.css";
 import { Picker } from "emoji-mart";
-import { Menu } from "semantic-ui-react";
 import "semantic-ui-css/semantic.min.css";
 import Speech from "speak-tts";
 import "@material/react-switch/dist/switch.css";
@@ -63,6 +62,7 @@ class App extends Component {
       this.setState({
         tweet: this.state.tweet + emojiPic
       });
+      this.speech.speak({ text: emojiPic });
     } else {
       let sym = e.unified.split("-");
       let codesArray = [];
@@ -73,6 +73,7 @@ class App extends Component {
       this.setState({
         tweet: this.state.tweet + emojiPic
       });
+      this.speech.speak({ text: emojiPic });
     }
   };
 
@@ -89,33 +90,38 @@ class App extends Component {
     this.setState({ checked: e.target.checked });
   };
 
+  onFocusHandler = message => {
+    this.speech.speak({
+      text: message
+    });
+  };
+
+  switchHandler = e => {
+    const status = e.target.checked ? "Online" : "Offline";
+    this.setState({ checked: e.target.checked });
+    this.speech.speak({ text: status });
+  };
+
   render() {
-    const { activeItem } = this.state;
     const tweets = this.state.tweets.map((tweet, i) => (
       <li key={i}>{tweet}</li>
     ));
 
     return (
       <div className="App">
+        <h1>Emojiujitsu Composer</h1>
         <div id="switch-container">
           <Switch
             nativeControlId="my-switch"
             checked={this.state.checked}
-            onChange={e => this.setState({ checked: e.target.checked })}
+            onChange={this.switchHandler}
           />
           <label htmlFor="my-switch">
             <span id="switch">{this.state.checked ? "Online" : "Offline"}</span>
           </label>
         </div>
-        <Menu tabular>
-          <Menu.Item
-            name="Editor"
-            active={activeItem === "Editor"}
-            onClick={this.handleItemClick}
-          />
-        </Menu>
         <div className="textarea-container">
-          <h1>Say something with emoji!</h1>
+          <h2>Say something with emoji!</h2>
           <h2>
             <div
               className="error"
@@ -127,20 +133,32 @@ class App extends Component {
             </div>
           </h2>
           <textarea
+            onFocus={e => this.onFocusHandler(e.target.placeholder)}
             onChange={this.changeHandler}
             value={this.state.tweet}
             name="tweet"
             placeholder="What's on your mind?"
           />
           <p>
-            <button onClick={this.speakButton}>Listen to message</button>
-            <button onClick={this.handleSubmitTweet}>Post your message</button>
+            <button
+              onClick={this.speakButton}
+              onFocus={e => this.onFocusHandler(e.target.innerText)}
+            >
+              Listen to message
+            </button>
+            <button
+              onClick={this.handleSubmitTweet}
+              onFocus={e => this.onFocusHandler(e.target.innerText)}
+            >
+              Post your message
+            </button>
           </p>
           <aside>
             <ul style={{ listStyleType: "none" }}>{tweets}</ul>
           </aside>
         </div>
         <div>
+          <h2>Click to select emoji</h2>
           <Picker
             onSelect={this.addEmoji}
             set="twitter"
