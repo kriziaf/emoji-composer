@@ -16,6 +16,7 @@ class App extends Component {
       tweets: [],
       checked: false,
       error: false,
+      emoji: undefined,
       errorMessage:
         "Switch the toggle on top of the screen to go online. You are currently offline."
     };
@@ -29,6 +30,8 @@ class App extends Component {
       voice: "Google UK English Male",
       splitSentences: true
     });
+
+    this.speakTweet = this.speakTweet.bind(this);
   }
 
   handleItemClick = (e, { name }) => this.setState({ activeItem: name });
@@ -102,14 +105,73 @@ class App extends Component {
     this.speech.speak({ text: status });
   };
 
+  async speakTweet(i) {
+    const tweet = this.state.tweets[i];
+    let counter = 0;
+    for (let ch of tweet) {
+      if (
+        ch.match(
+          /(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|[\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|[\ud83c[\ude32-\ude3a]|[\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/
+        )
+      ) {
+        const opts = {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ q: this.emojiUnicode(ch) })
+        };
+
+        const emoji = await fetch("http://localhost:3000/api/v1/search", opts)
+          .then(res => res.json())
+          .then(data => {
+            this.setState({ emoji: data });
+            return data;
+          });
+
+        let popularMeaning = emoji.aliases[0];
+
+        for (let el of emoji.aliases) {
+          if (popularMeaning.votes < el.votes) {
+            popularMeaning = el;
+          }
+        }
+
+        const newTweet =
+          tweet.slice(0, counter) +
+          "emoji " +
+          popularMeaning.alias.split("_").join(" ") +
+          tweet.slice(counter + ch.length, tweet.length);
+        this.speech.speak({ text: newTweet });
+      }
+      counter++;
+    }
+  }
+
+  emojiUnicode = emoji => {
+    let comp;
+    if (emoji.length === 1) {
+      comp = emoji.charCodeAt(0);
+    }
+    comp =
+      (emoji.charCodeAt(0) - 0xd800) * 0x400 +
+      (emoji.charCodeAt(1) - 0xdc00) +
+      0x10000;
+    if (comp < 0) {
+      comp = emoji.charCodeAt(0);
+    }
+    return comp.toString("16");
+  };
+
   render() {
     const tweets = this.state.tweets.map((tweet, i) => (
-      <li key={i}>{tweet}</li>
+      <li key={i}>
+        {tweet}
+        <button onClick={() => this.speakTweet(i)}>Listen</button>
+      </li>
     ));
 
     return (
       <div className="App">
-        <h1>Emojiujitsu Composer</h1>
+        <h1>Emojispeak Composer</h1>
         <div id="switch-container">
           <Switch
             nativeControlId="my-switch"
@@ -161,7 +223,7 @@ class App extends Component {
           <Picker
             onSelect={this.addEmoji}
             set="twitter"
-            title="emojiujitsu"
+            title="emojispeak"
             i18n={{
               search: "Search",
               categories: {
