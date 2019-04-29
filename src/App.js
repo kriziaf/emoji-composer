@@ -120,7 +120,7 @@ class App extends Component {
           body: JSON.stringify({ q: this.emojiUnicode(ch) })
         };
 
-        const emoji = await fetch("http://localhost:3000/api/v1/search", opts)
+        const emoji = await fetch("http://emoji-endpoit.herokuapp.com/api/v1/search", opts)
           .then(res => res.json())
           .then(data => {
             this.setState({ emoji: data });
