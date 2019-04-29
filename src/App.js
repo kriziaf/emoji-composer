@@ -86,12 +86,12 @@ class App extends Component {
     });
   };
 
-  swictchHandler = e => {
-    if (this.state.error) {
-      this.setState({ error: !this.state.error, checked: e.target.checked });
-    }
-    this.setState({ checked: e.target.checked });
-  };
+  // swictchHandler = e => {
+  //   if (this.state.error) {
+  //     this.setState({ error: !this.state.error, checked: e.target.checked });
+  //   }
+  //   this.setState({ checked: e.target.checked });
+  // };
 
   onFocusHandler = message => {
     this.speech.speak({
